@@ -1,0 +1,10 @@
+Name,Department,Contact,Salary,Leave,Total Leave,Designation
+Demo1,Developer,1234567890,20000,2,0,Developer
+Demo2,Tester,1234567890,10000,3,1,Developer
+Demo3,Designer,1234567890,50000,23,2,Developer
+Demo4,Developer,1234567890,25000,2,0,Developer
+Demo5,Designer,1234567890,35000,2,3,Developer
+Demo6,Tester,1234567890,56225,12,0,Developer
+Demo7,Devops,1234567890,25600,12,0,Developer
+Demo8,Developer,1234567890,10000,2,1,Developer
+Demo9,,,121211,2,1,developer
