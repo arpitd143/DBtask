@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>datatable</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<button class="add-new btn btn-success">Add</button>
+
+<div id="displaymessage" class="btn btn-info" style="display:non;width:100%;margin-top:10px;"></div>
+<table id="myTable" class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Designation</th>
+        <th>Salary</th>
+        <th>Contact</th>
+        <th>Leave</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    {% for d in data %}
+    <tbody>
+    <tr id="row" data-id="{{ d.id }}">
+        <td class="editable" data-type="name" data-id="{{ d.id }}">{{ d.name }}</td>
+        <td class="editable" data-type="department" data-id="{{ d.id }}">{{ d.department }}</td>
+        <td class="editable" data-type="designation" data-id="{{ d.id }}">{{ d.designation }}</td>
+        <td class="editable" data-type="salary" data-id="{{ d.id }}">{{ d.salary }}</td>
+        <td class="editable" data-type="contact" data-id="{{ d.id }}">{{ d.contact }}</td>
+        <td class="editable" data-type="leave" data-id="{{ d.id }}">{{ d.leave }}</td>
+        <td>
+            <button class="btn btn-danger" onclick="DelData({{ d.id }})">Delete</button>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+
+<script>
+        $(document).ready(function(){
+        $(document).on("click",".editable",function(){
+            var value = $(this).text();
+            var type = $(this).data("type");
+            var input_type = "text";
+            var input= "<input type='"+input_type+"' class='input-data' value='"+value+"'>";
+            $(this).html(input);
+            $(this).removeClass("editable")
+        });
+
+        $(document).on("blur",".input-data",function(){
+            var value =$(this).val();
+            var td=$(this).parent("td");
+            $(this).remove();
+            td.html(value);
+            td.addClass("editable");
+            var type=td.data("type");
+            var id=td.data("id");
+            console.log(type);
+            console.log(value);
+            console.log(id);
+            if (value == "") {
+                alert("enter valid value");
+
+               }else {
+                   senddata(id,value,type);
+                }
+        });
+
+
+        function senddata(id,value,type){
+<!--            console.log(id)-->
+            $.ajax({
+            url:"http://127.0.0.1:8000/update_data/",
+            type:"POST",
+            data:{id:id, type:type,value:value},
+        })
+        .done(function(response){
+            console.log(response);
+        })
+
+
+        }
+
+    });
+
+    function DelData(id){
+        console.log(id);
+        $.ajax({
+        url:"http://127.0.0.1:8000/delete_data/",
+        type:"POST",
+        data:{id:id},
+        })
+     .done(function(response){
+        console.log(response.success);
+        var re = response.success
+        if(re=="deleted"){
+            $("#row").remove();
+        }
+    })
+}
+
+
+$(document).ready(function(){
+    var actions = $("table td:last-child").html();
+    // Append table with add row form on add new button click
+    $(".add-new").click(function(){
+        $(this).attr("disabled", "disabled");
+        var index = $("table tbody tr:last-child").index();
+        var row = '<tr>' +
+            '<td><input type="text" id="name" name="name"></td>' +
+            '<td><input type="text" id="department"  name="department"></td>' +
+            '<td><input type="text" id="designation" name="phone"></td>'+
+             '<td><input type="text" id="salary" name="phone"></td>' +
+             '<td><input type="text" id="contact" name="phone"></td>' +
+             '<td><input type="text" id="leave" name="phone"></td>' +
+        '<td>' + '<button class="new">add</button>' + '</td>' +
+        '</tr>';
+        $("table").append(row);
+        $("table tbody tr").eq(index + 1).find(".add, .edit, .delete").toggle();
+
+    });
+
+    $(document).on("click",".new", function(){
+        var empty = false;
+        var input = $(this).parents("tr").find('input[type="text"]');
+        input.each(function(){
+        if(!$(this).val()){
+        $(this).addClass("error");
+        empty = true;
+        } else{
+        $(this).removeClass("error");
+        }
+        });
+        var name = $("#name").val();
+        var department = $("#department").val();
+        var leave = $("#leave").val();
+        var salary = $("#salary").val();
+        var designation = $("#designation").val();
+        var contact = $("#contact").val();
+        console.log(department)
+        $.post("http://127.0.0.1:8000/add_data/", {name: name, department: department, leave:leave, salary:salary,
+        designation:designation, contact:contact},
+        function(data) {
+        console.log(data)
+            $("#displaymessage").html(data.success);
+            $("#displaymessage").show();
+        });
+        $(this).parents("tr").find(".error").first().focus();
+        if(!empty){
+            input.each(function(){
+                $(this).parent("td").html($(this).val());
+            });
+            $(this).parents("tr").find(".add, .edit").toggle();
+            $(".add-new").removeAttr("disabled");
+        }
+    });
+
+    });
+
+
+
+</script>
+
+
+</body>
+</html>

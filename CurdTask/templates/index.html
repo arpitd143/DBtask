@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert">
+    <li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+    </div>
+    {% endfor %}
+</ul>
+{% endif %}
+<h1>Welcome</h1>
+<a href="showdata"><button>view data</button></a>
+<div style="margin-top:15px;">
+    <h3>Upload csv file here</h3>
+<form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.file }}<br><br>
+    <input type="submit" value="Upload">
+</form>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+window.setTimeout(function() {
+  $(".alert").fadeTo(500, 0).slideUp(500, function(){
+      $(this).remove();
+  });
+}, 2000);
+});
+
+</script>
+
+</body>
+</html>
